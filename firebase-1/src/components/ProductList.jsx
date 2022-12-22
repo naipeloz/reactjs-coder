@@ -1,37 +1,51 @@
-import { collection, getDocs, getFirestore, } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getAllCategories } from '../queries/categories';
+import { getAllProducts } from '../queries/products';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const db = getFirestore();
-    const productsRef = collection(db, 'products');
-    getDocs(productsRef)
-      .then((snapshot) => {
-        const productsTemp = [];
-        snapshot?.docs?.forEach((item) => {
-          productsTemp.push({id: item.id, ...item.data()})
-        })
-        setProducts(productsTemp)
+    getAllProducts(db)
+      .then((item) => {
+        setProducts(item)
       })
-      .catch((error) => {
-        console.log('error:', error)
+  }, []);
+
+  useEffect(() => {
+    const db = getFirestore();
+    getAllCategories(db)
+      .then((item) => {
+        setCategories(item)
       })
   }, []);
 
   const renderProducts = () => (
     products?.map(item => (
-      <div>
+      <div className='product' key={item.id}>
         <h2>{item.name}</h2>
         <p>{item.description}</p>
+        <Link to={`/product/${item.id}`}> Ver detalle </Link>
       </div>
     ))
+  )
+
+  const renderCategories = () => (
+    <ul>
+      {categories?.map(item => (
+        <Link to={`/category/${item.id}`}><li key={item?.id}>{item?.name}</li></Link>
+      ))}
+    </ul>
   )
 
   return (
     <>
       <h3>Acá va a ir la product list</h3>
+      {renderCategories()}
       {renderProducts()}
     </>
   )
