@@ -27,6 +27,7 @@ const ProductList = () => {
   const renderProducts = () => (
     products?.map(item => (
       <div className='product' key={item.id}>
+        {item.image && <img alt="imagen" src={item.image} />}
         <h2>{item.name}</h2>
         <p>{item.description}</p>
         <Link to={`/product/${item.id}`}> Ver detalle </Link>

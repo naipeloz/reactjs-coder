@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, get, where, query } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, where, query, deleteDoc } from 'firebase/firestore';
 
 const PRODUCT_COLLECTION = 'products';
 
@@ -34,7 +34,10 @@ export const getProductById = (db, id) => {
 }
 
 export const getProductsByCategory = (db, category_id) => {
-  const collectionRef = query(collection(db, PRODUCT_COLLECTION), where('category', '==', category_id))
+  const collectionRef = query(
+    collection(db, PRODUCT_COLLECTION),
+    where('category', '==', category_id)
+  )
   return getDocs(collectionRef)
     .then((snapshot) => {
       const products = [];
@@ -51,10 +54,22 @@ export const getProductsByCategory = (db, category_id) => {
     })
 }
 
-export const createProductById = (db) => {
-
+export const setProductById = (db, data, id=null) => {
+  let tempId = null
+  if (id) {
+    tempId = id;
+  } else {
+    tempId = `product-${Math.random()}`
+  }
+  return setDoc(doc(db, PRODUCT_COLLECTION, tempId), data)
+    .then((data) => {
+      console.log("Informacion guardada: ", data);
+    })
+    .catch((error) => {
+      console.log('error:', error)
+    })
 }
 
-export const deleteProductById = (db) => {
-
+export const deleteProductById = (db, id) => {
+  return deleteDoc(doc(db, PRODUCT_COLLECTION, id))
 }
